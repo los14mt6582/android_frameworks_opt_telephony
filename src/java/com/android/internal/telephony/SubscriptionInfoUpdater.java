@@ -324,7 +324,7 @@ public class SubscriptionInfoUpdater extends Handler {
                         mIccId[slotId] = ICCID_STRING_FOR_NO_SIM;
                     }
                 } else {
-                    mIccId[slotId] = IccConstants.FAKE_ICCID;
+                    mIccId[slotId] = ICCID_STRING_FOR_NO_SIM;
                     logd("Query IccId fail: " + ar.exception);
                 }
                 logd("sIccId[" + slotId + "] = " + mIccId[slotId]);
