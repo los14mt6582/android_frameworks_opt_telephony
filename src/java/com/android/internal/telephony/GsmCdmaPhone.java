@@ -1465,6 +1465,7 @@ public class GsmCdmaPhone extends Phone {
         }
     }
 
+
     @Override
     public String getMeid() {
         if (isPhoneTypeGsm()) {
@@ -1998,7 +1999,12 @@ public class GsmCdmaPhone extends Phone {
             // Complete pending USSD
 
             if (isUssdRelease) {
-                found.onUssdRelease();
+                // MTK weirdness
+                if(ussdMessage != null) {
+                    found.onUssdFinished(ussdMessage, isUssdRequest);
+                } else {
+                    found.onUssdRelease();
+                }
             } else if (isUssdError) {
                 found.onUssdFinishedError();
             } else {
@@ -2751,6 +2757,7 @@ public class GsmCdmaPhone extends Phone {
 
     private boolean isManualSelProhibitedInGlobalMode() {
         boolean isProhibited = false;
+
         final String configString = getContext().getResources().getString(com.android.internal.
                 R.string.prohibit_manual_network_selection_in_gobal_mode);
 
