@@ -45,7 +45,6 @@ import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
-import com.android.internal.telephony.RIL;
 import com.android.internal.telephony.uicc.IccCardProxy;
 import com.android.internal.telephony.uicc.IccConstants;
 import com.android.internal.telephony.uicc.IccFileHandler;
@@ -110,7 +109,6 @@ public class SubscriptionInfoUpdater extends Handler {
     public static final String CURR_SUBID = "curr_subid";
 
     private static Phone[] mPhone;
-    private CommandsInterface[] mCommandsInterfaces;
     private static Context mContext = null;
     protected static String mIccId[] = new String[PROJECT_SIM_NUM];
     private static int[] mInsertSimState = new int[PROJECT_SIM_NUM];
@@ -130,7 +128,6 @@ public class SubscriptionInfoUpdater extends Handler {
 
         mContext = context;
         mPhone = phone;
-        mCommandsInterfaces = ci;
         mSubscriptionManager = SubscriptionManager.from(mContext);
         mPackageManager = IPackageManager.Stub.asInterface(ServiceManager.getService("package"));
         mUserManager = (UserManager) mContext.getSystemService(Context.USER_SERVICE);
@@ -546,8 +543,13 @@ public class SubscriptionInfoUpdater extends Handler {
         if (userNwType != SubscriptionManager.DEFAULT_NW_MODE && userNwType != networkType) {
             networkType = userNwType;
         }
+        boolean isDsds = TelephonyManager.getDefault().getMultiSimConfiguration()
+                == TelephonyManager.MultiSimVariants.DSDS;
+        if (DBG) Rlog.d(LOG_TAG, "[setDefaultDataSubNetworkType] subId=" + subId);
+        if (DBG) Rlog.d(LOG_TAG, "[setDefaultDataSubNetworkType] isDSDS=" + isDsds);
+        boolean isMultiRat = SystemProperties.getBoolean("ro.ril.multi_rat_capable", true);
 
-        if (needsSim2gsmOnly()) {
+        if (isDsds && !isMultiRat) {
             int networkType2 = Phone.NT_MODE_GSM_ONLY; // Hardcoded due to modem limitation
             int slotId1 = SubscriptionManager.DEFAULT_SIM_SLOT_INDEX;
             int slotId2 = SubscriptionManager.DEFAULT_SIM_SLOT_INDEX;
@@ -591,12 +593,6 @@ public class SubscriptionInfoUpdater extends Handler {
                 networkType);
     }
 
-    private boolean needsSim2gsmOnly() {
-        if (mCommandsInterfaces[0] instanceof RIL) {
-            return ((RIL) mCommandsInterfaces[0]).needsOldRilFeature("sim2gsmonly");
-        }
-        return false;
-    }
 
     private void updateCarrierServices(int slotId, String simState) {
         CarrierConfigManager configManager = (CarrierConfigManager)
