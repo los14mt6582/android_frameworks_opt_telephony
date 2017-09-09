@@ -297,16 +297,13 @@ public class SubscriptionController extends ISub.Stub {
                 SubscriptionManager.MNC));
         // FIXME: consider stick this into database too
         String countryIso = getSubscriptionCountryIso(id);
-        int userNwMode = cursor.getInt(cursor.getColumnIndexOrThrow(
-                SubscriptionManager.USER_NETWORK_MODE));
 
         if (VDBG) {
             String iccIdToPrint = SubscriptionInfo.givePrintableIccid(iccId);
             logd("[getSubInfoRecord] id:" + id + " iccid:" + iccIdToPrint + " simSlotIndex:"
                     + simSlotIndex + " displayName:" + displayName + " nameSource:" + nameSource
                     + " iconTint:" + iconTint + " dataRoaming:" + dataRoaming
-                    + " mcc:" + mcc + " mnc:" + mnc + " countIso:" + countryIso
-                    + " userNwMode:" + userNwMode);
+                    + " mcc:" + mcc + " mnc:" + mnc + " countIso:" + countryIso);
         }
 
         if (isNumeric(carrierName)) {
@@ -320,8 +317,7 @@ public class SubscriptionController extends ISub.Stub {
             number = line1Number;
         }
         return new SubscriptionInfo(id, iccId, simSlotIndex, displayName, carrierName,
-                nameSource, iconTint, number, dataRoaming, iconBitmap, mcc, mnc,
-                countryIso, userNwMode);
+                nameSource, iconTint, number, dataRoaming, iconBitmap, mcc, mnc, countryIso);
     }
 
     /**
